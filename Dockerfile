@@ -5,7 +5,7 @@ RUN useradd fall_risk_db
 WORKDIR /home/fall_risk_db
 
 COPY requirements.txt requirements.txt
-#COPY migrations migrations
+COPY migrations migrations
 RUN python -m venv venv
 RUN venv/bin/python -m pip install --upgrade pip
 RUN venv/bin/pip install -r requirements.txt

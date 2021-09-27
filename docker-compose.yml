@@ -6,6 +6,7 @@ services:
       - "5000:5000"
     volumes:
       - "./app:/home/fall_risk_db/app"
+      - "./migrations:/home/fall_risk_db/migrations"
     depends_on:
       - "db"
   db:
@@ -15,4 +16,4 @@ services:
       - "POSTGRES_USER=user"
       - "POSTGRES_PASSWORD=password"
     volumes:
-      - "./postgresql/data:/var/lib/postgresql/data"
+      - "./postgresql-data:/var/lib/postgresql/data"

@@ -12,16 +12,12 @@ from app.api.auth import token_auth
 def create_user():
     data = request.get_json()
 
-    for field in ['username', 'email', 'password']:
+    for field in ['email', 'password']:
         if field not in data:
             return bad_request('The field \'{}\' must be included.'.format(key))
 
-    if User.query.filter_by(username=data['username']).first():
-        return bad_request('The username \'{}\' already exists.'
-                           'Please choose another username.'.format(data['username']))
-
     if User.query.filter_by(email=data['email']).first():
-        return bad_request('The email address \'{}\' already exists.'
+        return bad_request('The email address \'{}\' already exists. '
                            'Please choose another email address.'.format(data['email']))
 
     user = User()
@@ -50,11 +46,8 @@ def get_user():
 def modify_user():
     data = request.get_json()
 
-    if 'username' in data and User.query.filter_by(username=data['username']).first() is not None:
-        return bad_request('The username \'{}\' already exists.'
-                           'Please choose another username.'.format(data['username']))
     if 'email' in data and User.query.filter_by(email=data['email']).first() is not None:
-        return bad_request('The email address \'{}\' already exists.'
+        return bad_request('The email address \'{}\' already exists. '
                            'Please choose another email address.'.format(data['email']))
 
     token_auth.current_user().modification_timestamp = datetime.utcnow()
