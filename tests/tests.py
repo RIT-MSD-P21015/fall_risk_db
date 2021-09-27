@@ -8,21 +8,22 @@ import uuid
 import random
 
 
-base_url = 'http://127.0.0.1:5000'
+base_url = 'http://0.0.0.0:5000'
 
 
 class TestUser():
-    def __init__(self, username=None, password=None, email=None):
-        self.username = uuid.uuid4().hex if username is None else username
-        self.password = uuid.uuid4().hex if password is None else password
+    def __init__(self, firstname=None, lastname=None, email=None, password=None):
+        self.firstname = uuid.uuid4().hex if firstname is None else firstname
+        self.lastname = uuid.uuid4().hex if lastname is None else lastname
         self.email = '{}@rit.edu'.format(uuid.uuid4().hex) if email is None else email
+        self.password = uuid.uuid4().hex if password is None else password
         self.survey = None
         self.tests = None
         self.token = None
 
 
     def __repr__(self):
-        return '{}'.format(self.username)
+        return '{}'.format(self.email)
 
 
     def new_survey(self):
@@ -39,7 +40,8 @@ class TestUser():
 
     def create_profile(self):
         user = {
-            'username' : self.username,
+            'firstname' : self.firstname,
+            'lastname' : self.lastname,
             'password' : self.password,
             'email' : self.email
         }
@@ -48,21 +50,21 @@ class TestUser():
 
         error = r.status_code != 201
 
-        print('Username {} - Create user profile - {}'.format(self, 'PASS' if not error else 'FAIL'))
+        print('Email {} - Create user profile - {}'.format(self, 'PASS' if not error else 'FAIL'))
 
 
     def get_token(self):
-        r = requests.post('{}/{}'.format(base_url, 'api/tokens'), auth=(self.username, self.password))
+        r = requests.post('{}/{}'.format(base_url, 'api/tokens'), auth=(self.email, self.password))
 
         error = r.status_code != 200
 
-        print('Username {} - Get access token - {}'.format(self, 'PASS' if not error else 'FAIL'))
+        print('Email {} - Get access token - {}'.format(self, 'PASS' if not error else 'FAIL'))
 
         if not error:
             self.token = json.loads(r.text)['token']
 
 
-    def update_profile(self, username=None, email=None):
+    def update_profile(self, email=None):
         data = {}
 
         if self.tests is not None:
@@ -77,11 +79,11 @@ class TestUser():
 
         error = r.status_code != 200
 
-        print('Username {} - Update user profile - {}'.format(self, 'PASS' if not error else 'FAIL'))
+        print('Email {} - Update user profile - {}'.format(self, 'PASS' if not error else 'FAIL'))
 
 class TestAdmin(TestUser):
-    def __init__(self, username='admin', password='secret', email='admin@rit.edu'):
-        super().__init__(username=username, password=password, email=email)
+    def __init__(self, firstname='admin', lastname='admin', email='admin@rit.edu', password='secret'):
+        super().__init__(firstname=firstname, lastname=lastname, email=email, password=password)
 
 
     def get_data(self):
