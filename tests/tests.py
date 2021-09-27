@@ -12,7 +12,9 @@ base_url = 'http://0.0.0.0:5000'
 
 
 class TestUser():
-    def __init__(self, email=None, password=None):
+    def __init__(self, firstname=None, lastname=None, email=None, password=None):
+        self.firstname = uuid.uuid4().hex if firstname is None else firstname
+        self.lastname = uuid.uuid4().hex if lastname is None else lastname
         self.email = '{}@rit.edu'.format(uuid.uuid4().hex) if email is None else email
         self.password = uuid.uuid4().hex if password is None else password
         self.survey = None
@@ -38,6 +40,8 @@ class TestUser():
 
     def create_profile(self):
         user = {
+            'firstname' : self.firstname,
+            'lastname' : self.lastname,
             'password' : self.password,
             'email' : self.email
         }
@@ -78,8 +82,8 @@ class TestUser():
         print('Email {} - Update user profile - {}'.format(self, 'PASS' if not error else 'FAIL'))
 
 class TestAdmin(TestUser):
-    def __init__(self, email='admin@rit.edu', password='secret'):
-        super().__init__(email=email, password=password)
+    def __init__(self, firstname='admin', lastname='admin', email='admin@rit.edu', password='secret'):
+        super().__init__(firstname=firstname, lastname=lastname, email=email, password=password)
 
 
     def get_data(self):

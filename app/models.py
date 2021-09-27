@@ -8,7 +8,9 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 class User(db.Model):
     id = db.Column(db.Integer, index=True, primary_key=True)
-    email = db.Column(db.String(128), index=True, unique=True)
+    firstname = db.Column(db.String(128), nullable=False)
+    lastname = db.Column(db.String(128), nullable=False)
+    email = db.Column(db.String(128), index=True, unique=True, nullable=False)
     admin = db.Column(db.Boolean, default=False)
     creation_timestamp = db.Column(db.DateTime, default=datetime.utcnow())
     modification_timestamp = db.Column(db.DateTime, default=datetime.utcnow())
@@ -67,6 +69,8 @@ class User(db.Model):
     def to_dict(self):
         data = {
             'id' : self.id,
+            'firstname' : self.firstname,
+            'lastname' : self.lastname,
             'email' : self.email,
             'creation_timestamp' : self.creation_timestamp.isoformat(),
             'modification_timestamp' : None if self.modification_timestamp is None else self.modification_timestamp.isoformat(),
@@ -81,7 +85,7 @@ class User(db.Model):
         return data
 
     def from_dict(self, data, new_user=False):
-        for field in ['email']:
+        for field in ['firstname', 'lastname', 'email']:
             if field in data:
                 setattr(self, field, data[field])
 

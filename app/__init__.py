@@ -17,14 +17,16 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
 
     @app.cli.command("create-admin")
-    @click.argument("username", default='admin')
-    @click.argument("password", default='secret')
+    @click.argument("firstname", default='admin')
+    @click.argument("lastname", default='admin')
     @click.argument("email", default='admin@rit.edu')
-    def create_admin(username, password, email):
+    @click.argument("password", default='secret')
+    def create_admin(firstname, lastname, email, password):
         admin = User()
-        admin.username = username
-        admin.set_password(password)
+        admin.firstname = firstname
+        admin.lastname = lastname
         admin.email = email
+        admin.set_password(password)
         admin.admin = True
         db.session.merge(admin)
         db.session.commit()

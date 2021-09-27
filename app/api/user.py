@@ -12,7 +12,7 @@ from app.api.auth import token_auth
 def create_user():
     data = request.get_json()
 
-    for field in ['email', 'password']:
+    for field in ['firstname', 'lastname', 'email', 'password']:
         if field not in data:
             return bad_request('The field \'{}\' must be included.'.format(key))
 
