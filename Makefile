@@ -1,9 +1,20 @@
 name = fall_risk_db
 
-.PHONY: env clean
+.PHONY: dev test clean
 
-env:
-	export FLASK_APP=$(name).py
+dev:
+	export FLASK_APP=$(name).py && \
+	export FLASK_ENV=development && \
+	export APP_CONFIG=config.DevelopmentConfig && \
+	flask db upgrade && \
+	flask run
+
+test:
+	export FLASK_APP=$(name).py && \
+	export FLASK_ENV=production && \
+	export APP_CONFIG=config.TestingConfig && \
+	flask db upgrade && \
+	flask run
 
 clean:
-	docker system prune -a
+	rm -f db.sqlite3
