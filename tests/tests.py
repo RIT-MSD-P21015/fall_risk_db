@@ -6,9 +6,11 @@ import pickle
 import base64
 import uuid
 import random
+import numpy as np
 
 
-base_url = 'http://0.0.0.0:5000'
+base_url = 'http://fallriskdb-vm.main.ad.rit.edu:5000'
+#base_url = 'http://0.0.0.0:5000'
 
 
 class TestUser():
@@ -34,7 +36,7 @@ class TestUser():
             'gender' : random.sample(['Male', 'Female', 'Other'], 1)[0]
         }
 
-    def new_tests(self, m=10000, n=9):
+    def new_tests(self, m=3000, n=324):
         self.tests = [[random.uniform(0, 100) for i in range(n)] for i in range(m)]
 
 
@@ -68,7 +70,6 @@ class TestUser():
         data = {}
 
         if self.tests is not None:
-            # obj = pickle.loads(base64.b64decode(d['tests'].encode('utf-8')))
             data['tests'] = base64.b64encode(pickle.dumps(self.tests)).decode('utf-8')
         if self.survey is not None:
             data['survey'] = json.dumps(self.survey)
@@ -127,9 +128,9 @@ class TestAdmin(TestUser):
 
 def main():
     # Number of users to be created.
-    n = 10
+    n = 5
     # Number of users who take the tests and survey.
-    k = 5
+    k = 1
 
     # Access admin account.
     admin = TestAdmin()
@@ -156,12 +157,28 @@ def main():
 
     data = admin.get_data()
 
-    print('Found {} users who need to be evaluated.'.format(len(data)))
+    if data is not None:
+        print('Found {} users who need to be evaluated.'.format(len(data)))
 
-    cmt = admin.post_results(data)
+        cmt = admin.post_results(data)
 
-    print('Was able to update {} out of {} users fall risk.'.format(cmt['results_updated'], len(data)))
+        print('Was able to update {} out of {} users fall risk.'.format(cmt['results_updated'], len(data)))
 
+        if k == 1:
+            sent = np.array(users[idx].tests)
+            received = np.array(pickle.loads(base64.b64decode(data[0]['tests'].encode('utf-8'))))
+
+            print('Sent tests are equal to the received tests? {}'.format('PASS' if np.allclose(sent, received) else 'FAIL'))
+
+            print('Printing the rest of the data ...')
+            print()
+
+            data[0].pop('tests')
+
+            print(json.dumps(data[0], indent=2))
+
+    else:
+        print('WARNING: no admin account?')
 
 if __name__ == '__main__':
     main()
