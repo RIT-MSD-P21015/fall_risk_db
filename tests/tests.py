@@ -6,12 +6,18 @@ import pickle
 import base64
 import uuid
 import random
-import numpy as np
+import argparse
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--number-of-users', type=int, default=8)
+parser.add_argument('--number-of-user-tests', type=int, default=4)
+parser.add_argument('--use-server', action='store_true')
+args = parser.parse_args()
 
-base_url = 'http://fallriskdb-vm.main.ad.rit.edu:5000'
-#base_url = 'http://0.0.0.0:5000'
-
+if args.use_server:
+    base_url = 'http://fallriskdb-vm.main.ad.rit.edu:5000'
+else:
+    base_url = 'http://0.0.0.0:5000'
 
 class TestUser():
     def __init__(self, firstname=None, lastname=None, email=None, password=None):
@@ -128,9 +134,9 @@ class TestAdmin(TestUser):
 
 def main():
     # Number of users to be created.
-    n = 5
+    n = args.number_of_users
     # Number of users who take the tests and survey.
-    k = 1
+    k = args.number_of_user_tests
 
     # Access admin account.
     admin = TestAdmin()
@@ -164,21 +170,29 @@ def main():
 
         print('Was able to update {} out of {} users fall risk.'.format(cmt['results_updated'], len(data)))
 
-        if k == 1:
-            sent = np.array(users[idx].tests)
-            received = np.array(pickle.loads(base64.b64decode(data[0]['tests'].encode('utf-8'))))
+        user = users[idxs[random.randint(0, k - 1)]]
 
-            print('Sent tests are equal to the received tests? {}'.format('PASS' if np.allclose(sent, received) else 'FAIL'))
+        sent = user.tests
 
-            print('Printing the rest of the data ...')
-            print()
+        test_passed = False
+        for i in range(len(data)):
+            if data[i]['email'] == user.email:
+                received = pickle.loads(base64.b64decode(data[i]['tests'].encode('utf-8')))
 
-            data[0].pop('tests')
+                print('Sent tests are equal to the received tests? {}'.format('PASS' if sent == received else 'FAIL'))
 
-            print(json.dumps(data[0], indent=2))
+                print('Printing the rest of the data ...')
+                print()
 
-    else:
-        print('WARNING: no admin account?')
+                data[0].pop('tests')
+
+                print(json.dumps(data[0], indent=2))
+
+                test_passed = True
+                break
+        
+        if not test_passed:
+            print('User was not found in the data.')
 
 if __name__ == '__main__':
     main()
