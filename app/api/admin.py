@@ -44,11 +44,21 @@ def admin_create_results():
 @bp.route('admin/data', methods=['GET'])
 @token_auth.login_required(role='admin')
 def admin_get_data():
-    users = User.query.filter(
-        ((User.result_timestamp <= User.survey_timestamp) | (User.result_timestamp <= User.tests_timestamp)) |
-        ((User.result_timestamp == None) & (User.survey_timestamp != None) & (User.tests_timestamp != None)))
+    limit = request.args.get('limit', type=int, default=25)
 
-    data = [ user.to_dict() for user in users ]
+    if limit < 1:
+        return bad_request('The limit must be greater than 0.')
+
+    users = User.query.\
+        filter(((User.tests_timestamp != None) &
+                (User.survey_timestamp != None)) &
+               ((User.result_timestamp == None) |
+                (User.result_timestamp <= User.tests_timestamp))).\
+        order_by(User.tests_timestamp.asc()).\
+        limit(limit).\
+        all()
+
+    data = [ user.to_dict(survey=True, tests=True) for user in users ]
 
     response = jsonify(data)
     response.status_code = 200

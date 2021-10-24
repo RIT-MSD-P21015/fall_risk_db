@@ -36,7 +36,9 @@ def create_user():
 @bp.route('/user', methods=['GET'])
 @token_auth.login_required
 def get_user():
-    response = jsonify(token_auth.current_user().to_dict())
+    survey = request.args.get('survey', type=int, default=False)
+    tests = request.args.get('tests', type=int, default=False)
+    response = jsonify(token_auth.current_user().to_dict(survey=survey, tests=tests))
     response.status_code = 200
     return response
 
@@ -60,3 +62,10 @@ def modify_user():
     response.status_code = 200
 
     return response
+
+
+@bp.route('/user', methods=['DELETE'])
+@token_auth.login_required
+def delete_user():
+    db.session.delete(token_auth.current_user())
+    return ('', 204)

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 import requests
 import json
 import pickle
@@ -8,16 +9,19 @@ import uuid
 import random
 import argparse
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--number-of-users', type=int, default=8)
 parser.add_argument('--number-of-user-tests', type=int, default=4)
 parser.add_argument('--use-server', action='store_true')
 args = parser.parse_args()
 
+
 if args.use_server:
     base_url = 'http://fallriskdb-vm.main.ad.rit.edu:5000'
 else:
     base_url = 'http://0.0.0.0:5000'
+
 
 class TestUser():
     def __init__(self, firstname=None, lastname=None, email=None, password=None):
@@ -34,6 +38,18 @@ class TestUser():
         return '{}'.format(self.email)
 
 
+    def get_data(self):
+        header = {'Authorization' : 'Bearer {}'.format(self.token)}
+        params = {'tests' : 0, 'survey' : 1}
+        r = requests.get('{}/{}'.format(base_url, 'api/user'), params=params, headers=header)
+        print(json.loads(r.text))
+
+
+    def delete_data(self):
+        header = {'Authorization' : 'Bearer {}'.format(self.token)}
+        r = requests.delete('{}/{}'.format(base_url, 'api/user'), headers=header)
+
+
     def new_survey(self):
         self.survey = {
             'age' : random.randint(1, 100),
@@ -41,6 +57,7 @@ class TestUser():
             'weight' : random.randint(50, 300),
             'gender' : random.sample(['Male', 'Female', 'Other'], 1)[0]
         }
+
 
     def new_tests(self, m=3000, n=324):
         self.tests = [[random.uniform(0, 100) for i in range(n)] for i in range(m)]
@@ -87,6 +104,7 @@ class TestUser():
         error = r.status_code != 200
 
         print('Email {} - Update user profile - {}'.format(self, 'PASS' if not error else 'FAIL'))
+
 
 class TestAdmin(TestUser):
     def __init__(self, firstname='admin', lastname='admin', email='admin@rit.edu', password='secret'):
@@ -193,6 +211,9 @@ def main():
         
         if not test_passed:
             print('User was not found in the data.')
+
+        user.delete_data()
+
 
 if __name__ == '__main__':
     main()

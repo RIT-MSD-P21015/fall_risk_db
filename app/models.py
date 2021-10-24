@@ -66,7 +66,7 @@ class User(db.Model):
         return user
 
 
-    def to_dict(self):
+    def to_dict(self, survey=False, tests=False):
         data = {
             'id' : self.id,
             'firstname' : self.firstname,
@@ -74,15 +74,20 @@ class User(db.Model):
             'email' : self.email,
             'creation_timestamp' : self.creation_timestamp.isoformat(),
             'modification_timestamp' : None if self.modification_timestamp is None else self.modification_timestamp.isoformat(),
-            'survey' : self.survey,
             'survey_timestamp' : None if self.survey_timestamp is None else self.survey_timestamp.isoformat(),
-            'tests' : None if self.tests is None else base64.b64encode(self.tests).decode('utf-8'),
             'tests_timestamp' : None if self.tests_timestamp is None else self.tests_timestamp.isoformat(),
             'result' : self.result,
             'result_timestamp' : None if self.result_timestamp is None else self.result_timestamp.isoformat()
         }
 
+        if survey:
+            data['survey'] = self.survey
+
+        if tests:
+            data['tests'] = None if self.tests is None else base64.b64encode(self.tests).decode('utf-8')
+
         return data
+
 
     def from_dict(self, data, new_user=False):
         for field in ['firstname', 'lastname', 'email']:
