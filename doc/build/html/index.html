@@ -1,0 +1,526 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Fall Risk DB &#8212; Fall Risk DB  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Fall Risk DB  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Fall Risk DB</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="fall-risk-db">
+<h1>Fall Risk DB<a class="headerlink" href="#fall-risk-db" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<section id="running-the-development-server">
+<h2>Running the development server<a class="headerlink" href="#running-the-development-server" title="Permalink to this headline">¶</a></h2>
+<p>Using the development server is an easy process. First, you will need to clone the repository and change your directory to the root of the project.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone git@github.com:RIT-MSD-P21015/fall_risk_db.git
+$ cd fall_risk_db
+</pre></div>
+</div>
+<p>Next, we will install our virtual environment. This project requires that you have Python 3 installed on your system.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python3 -m venv venv
+$ source venv/bin/activate
+$ pip install --upgrade pip
+$ pip install -r requirements.txt
+</pre></div>
+</div>
+<p>Now we are ready to run the web server. Next, open up another terminal, change the working directory to the root of the git repository, and activate the virtual environment we just created. Now we are ready to run the development server. In the same terminal, run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">dev</span></code>. You should now see that the server is up and running at <code class="docutils literal notranslate"><span class="pre">http://0.0.0.0:5000</span></code> and ready to accept connections. Leave this terminal open, as it will contain useful debugging information regarding the server. In another terminal, navigate to the root the git repository and notice the new sqlite database that has been created called <code class="docutils literal notranslate"><span class="pre">db.sqlite3</span></code>. You can use a database viewer such as the one <a class="reference external" href="https://sqlitebrowser.org/">here</a> to view the database in real time.</p>
+<p>Next, with the development server still up an running, we will seed the database with an administrator account. Using a new terminal, change the working directory to the root of the git repository and activate the virtual environment. Enter the following commands into your shell with the <code class="docutils literal notranslate"><span class="pre">&lt;firstname&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;lastname&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;email&gt;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&lt;password&gt;</span></code> fields replaced with the values of your choice for the admin account.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export FLASK_APP=fall_risk_db.py
+$ flask create-admin &lt;firstname&gt; &lt;lastname&gt; &lt;email&gt; &lt;password&gt;
+</pre></div>
+</div>
+<p>Now the web server is ready to be used. Alternatively, you can open up a special Python shell to interact in real time with the application using <code class="docutils literal notranslate"><span class="pre">flask</span> <span class="pre">shell</span></code>. Note that when you shut down the server, the <code class="docutils literal notranslate"><span class="pre">db.sqlite3</span></code> database file will still persist, and will be used on the next start up.</p>
+</section>
+<section id="the-authentication-process">
+<h2>The authentication process<a class="headerlink" href="#the-authentication-process" title="Permalink to this headline">¶</a></h2>
+<p>In order to use the REST API, the user must create an account using the <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/user</span></code> endpoint. Admin accounts must be created manually as described in the previous section. Once the account has been created the first step is to get a temporary access token using the <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/tokens</span></code> endpoint. In this request, the email and password of the user account must be included in the HTTP header as shown below. This protocol is referred to as <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc7617">Basic Authentication</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Authorization</span><span class="p">:</span> <span class="n">Basic</span> <span class="o">&lt;</span><span class="n">credentials</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">credentials</span></code> is the base64 encoded version of the colon separated string <code class="docutils literal notranslate"><span class="pre">email:password</span></code>. Once this request is made, you will now have access to your temporary access token. This token is linked back to your account so when you use in an API request, it will return or modify data from your account. To use the token in an API request, you will need encode this in your HTTP header as shown below. This protocol is referred to as <a class="reference external" href="https://datatracker.ietf.org/doc/html/rfc6750">Bearer Authentication</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Authorization</span><span class="p">:</span> <span class="n">Bearer</span> <span class="o">&lt;</span><span class="n">token</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>This should be all you need to get going. See the source code documentation for more details about the REST API.</p>
+</section>
+</section>
+<section id="source-code">
+<h1>Source Code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h1>
+<section id="user-model">
+<h2>User Model<a class="headerlink" href="#user-model" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.models.User">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">app.models.</span></span><span class="sig-name descname"><span class="pre">User</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.models.User" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sqlalchemy.orm.decl_api.Model</span></code></p>
+<p>A table entry that contains user data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – The unique integer id of a user.</p></li>
+<li><p><strong>firstname</strong> – The string first name of a user.</p></li>
+<li><p><strong>lastname</strong> – The string last name of a user.</p></li>
+<li><p><strong>email</strong> – The unique string email address of a user.</p></li>
+<li><p><strong>admin</strong> – A boolean flag indicating if a user has admin privileges or not.</p></li>
+<li><p><strong>creation_timestamp</strong> – A datetime object containing the creation date of the user account.</p></li>
+<li><p><strong>modification_timestamp</strong> – A datetime object containing the date that the user account was last modified. Defaults to the creation_timestamp value.</p></li>
+<li><p><strong>survey</strong> – A JSON string containing a the survey data of a user.</p></li>
+<li><p><strong>survey_timestamp</strong> – A datetime object containing the date of the last survey that the user took. This value can be None.</p></li>
+<li><p><strong>tests</strong> – A binary blob containing the serialized Java class that should contain the tests data of a user. This value can be None.</p></li>
+<li><p><strong>tests_timestamp</strong> – A datetime object containing the date of the last tests that the user took. This value can be None.</p></li>
+<li><p><strong>result</strong> – A JSON string containing the fall risk result. This value can be None.</p></li>
+<li><p><strong>result_timestamp</strong> – A datetime object containing the date of the last result that was posted.</p></li>
+<li><p><strong>password_hash</strong> – A string containing the user hashed password.</p></li>
+<li><p><strong>token</strong> – A string that contains a user temporary access token.</p></li>
+<li><p><strong>token_expiration</strong> – A datetime object that contains the expiration date of a user token.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="app.models.User.check_password">
+<span class="sig-name descname"><span class="pre">check_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.models.User.check_password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check a user password.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>password</strong> – The string representation of the user password.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns true if the password matches, otherwise, it returns false.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.models.User.check_token">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">check_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.models.User.check_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check to see if a token links back to a user table entry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>token</strong> – The string token to be compared against.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns the user object whose token matches the token given. Otherwise, this will return None.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#app.models.User" title="app.models.User">app.models.User</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.models.User.from_dict">
+<span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.models.User.from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update a user table entry from a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – The dictionary containing key value pairs to update user attributes.</p></li>
+<li><p><strong>new_user</strong> – Allow for the password key to be used to change a user password.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.models.User.get_token">
+<span class="sig-name descname"><span class="pre">get_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expires_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3600</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.models.User.get_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a new temporary access token.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>expires_in</strong> – The number of minutues before the token expires.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Returns the new string token.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.models.User.revoke_token">
+<span class="sig-name descname"><span class="pre">revoke_token</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.models.User.revoke_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Revoke the current access token.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.models.User.set_password">
+<span class="sig-name descname"><span class="pre">set_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">password</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.models.User.set_password" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a user password. But only store the hashed password in the
+member variable password_hash.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>password</strong> – The string representation of the user password.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="app.models.User.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">survey</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tests</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#app.models.User.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent a user table entry as a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>survey</strong> – A boolean value indicating whether or not to include the user survey results.</p></li>
+<li><p><strong>tests</strong> – A boolean value indicating whether or not to include the user tests data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary representation of the user table entry.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="rest-api-endpoints">
+<h2>REST API Endpoints<a class="headerlink" href="#rest-api-endpoints" title="Permalink to this headline">¶</a></h2>
+<section id="module-app.api.user">
+<span id="user"></span><h3>User<a class="headerlink" href="#module-app.api.user" title="Permalink to this headline">¶</a></h3>
+<p>User REST API endpoints.</p>
+<p>These are the REST API endpoints that are available to users to create, modify,
+and delete their data.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.api.user.create_user">
+<span class="sig-prename descclassname"><span class="pre">app.api.user.</span></span><span class="sig-name descname"><span class="pre">create_user</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.api.user.create_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a user account. Returns a 201 status code if successful.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">POST</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">user</span>
+</pre></div>
+</div>
+<p>Expected JSON input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;firstname&quot;</span> <span class="p">:</span> <span class="s2">&quot;john&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;lastname&quot;</span> <span class="p">:</span> <span class="s2">&quot;doe&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;email&quot;</span> <span class="p">:</span> <span class="s2">&quot;jdoe@gmail.com&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;password&quot;</span> <span class="p">:</span> <span class="s2">&quot;secret&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The above JSON fields are required. If the email already exists from
+another account an error is raised.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.api.user.delete_user">
+<span class="sig-prename descclassname"><span class="pre">app.api.user.</span></span><span class="sig-name descname"><span class="pre">delete_user</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.api.user.delete_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a user account and all user data. Returns a 204 status code on
+success.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DELETE</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">user</span>
+</pre></div>
+</div>
+<p>This endpoint is locked down via token authentication and will require a
+bearer token to be included in the HTTP header. Since each token is unique
+and linked back to a single user, this endpoint will delete all user data
+associated with the user attached to the provided token.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.api.user.get_user">
+<span class="sig-prename descclassname"><span class="pre">app.api.user.</span></span><span class="sig-name descname"><span class="pre">get_user</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.api.user.get_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get user data. Returns a 200 status code if successful.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>GET /api/user/?survey=0&amp;tests=0
+</pre></div>
+</div>
+<p>This endpoint is locked down via token authentication and will require a
+bearer token to be included in the HTTP header. Since each token is unique
+and linked back to a single user, this endpoint will return the user data
+associated with the user attached to the provided token.</p>
+<p>Setting the survey and/or tests parameters to 1 will include the survey
+and/or tests data associated with the user in the response. Including the
+tests data will greatly slow down the response time.</p>
+<p>Expected JSON response:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1234</span><span class="p">,</span>
+  <span class="s2">&quot;firstname&quot;</span> <span class="p">:</span> <span class="s2">&quot;john&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;lastname&quot;</span> <span class="p">:</span> <span class="s2">&quot;doe&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;email&quot;</span> <span class="p">:</span> <span class="s2">&quot;jdoe@gmail.com&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;creation_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;modification_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;survey_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;tests_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;result&quot;</span> <span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+  <span class="s2">&quot;result_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;survey&quot;</span> <span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+  <span class="s2">&quot;tests&quot;</span> <span class="p">:</span> <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The survey and result value will typically be a JSON string and the tests
+value will be a base64 encoded string. Some of these dates are allowed to
+be NULL.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.api.user.modify_user">
+<span class="sig-prename descclassname"><span class="pre">app.api.user.</span></span><span class="sig-name descname"><span class="pre">modify_user</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.api.user.modify_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modify user profile and optionally add survey or tests data. Will
+return a 200 status code on success.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PUT</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">user</span>
+</pre></div>
+</div>
+<p>This endpoint is locked down via token authentication and will require a
+bearer token to be included in the HTTP header. Since each token is unique
+and linked back to a single user, this endpoint will update the fields
+associated with the user attached to the provided token.</p>
+<p>Expected JSON input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;firstname&quot;</span> <span class="p">:</span> <span class="s2">&quot;john&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;lastname&quot;</span> <span class="p">:</span> <span class="s2">&quot;doe&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;email&quot;</span> <span class="p">:</span> <span class="s2">&quot;jdoe@gmail.com&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;survey&quot;</span> <span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+  <span class="s2">&quot;tests&quot;</span> <span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+  <span class="s2">&quot;password&quot;</span> <span class="p">:</span> <span class="s2">&quot;secret&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>All of the above JSON fields are optional. Note that the survey value
+should be a JSON string and the tests value should be a base64 string.</p>
+</dd></dl>
+
+</section>
+<section id="module-app.api.admin">
+<span id="admin"></span><h3>Admin<a class="headerlink" href="#module-app.api.admin" title="Permalink to this headline">¶</a></h3>
+<p>Admin REST API endpoints.</p>
+<p>These REST API endpoints are only available to users who have the admin flag
+set on their account. This can only be done manually by a system administrator.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.api.admin.admin_create_results">
+<span class="sig-prename descclassname"><span class="pre">app.api.admin.</span></span><span class="sig-name descname"><span class="pre">admin_create_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.api.admin.admin_create_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Post user results to the database. Returns a 200 status code on success
+along with some statistics in JSON form.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PUT</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">admin</span><span class="o">/</span><span class="n">results</span>
+</pre></div>
+</div>
+<p>Note that this entry is locked down via token authentication and has the
+additional requirement that the user associated with the token has the
+admin flag set on their account. The token must be provided in the HTTP
+header as a bearer token.</p>
+<p>Expected JSON input:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1234</span><span class="p">,</span>
+    <span class="s2">&quot;result&quot;</span> <span class="p">:</span> <span class="o">...</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">2345</span><span class="p">,</span>
+    <span class="s2">&quot;result&quot;</span> <span class="p">:</span> <span class="o">...</span>
+  <span class="p">},</span>
+  <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Note that the result value can be any JSON string.</p>
+<p>If any of the user id are invalid, the corresponding list entry will be
+skipped and an error will not be thrown. The failed ids will be listed
+in the returned JSON.</p>
+<p>Expected JSON response:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;error&quot;</span> <span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+  <span class="s2">&quot;results_submitted&quot;</span> <span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+  <span class="s2">&quot;results_updated&quot;</span> <span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+  <span class="s2">&quot;failed_ids&quot;</span> <span class="p">:</span> <span class="p">[</span> <span class="mi">1234</span><span class="p">,</span> <span class="mi">2345</span><span class="p">,</span> <span class="mi">3456</span> <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.api.admin.admin_get_data">
+<span class="sig-prename descclassname"><span class="pre">app.api.admin.</span></span><span class="sig-name descname"><span class="pre">admin_get_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.api.admin.admin_get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get tests and survey data from all users who need to be evaluated for
+fall risk.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>GET /api/admin/data/?limit=25
+</pre></div>
+</div>
+<p>Note that this entry is locked down via token authentication and has the
+additional requirement that the user associated with the token has the
+admin flag set on their account. The token must be provided in the HTTP
+header as a bearer token.</p>
+<p>The limit parameter is used to limit the number of user data returned.
+By default limit is set to be 25.</p>
+<p>Expected JSON response:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="p">[</span>
+   <span class="p">{</span>
+     <span class="s2">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1234</span><span class="p">,</span>
+     <span class="s2">&quot;firstname&quot;</span> <span class="p">:</span> <span class="s2">&quot;john&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;lastname&quot;</span> <span class="p">:</span> <span class="s2">&quot;doe&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;email&quot;</span> <span class="p">:</span> <span class="s2">&quot;jdoe@gmail.com&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;creation_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;modification_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;survey_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;tests_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;result&quot;</span> <span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+     <span class="s2">&quot;result_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;survey&quot;</span> <span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+     <span class="s2">&quot;tests&quot;</span> <span class="p">:</span> <span class="o">...</span>
+  <span class="p">},</span>
+  <span class="p">{</span>
+     <span class="s2">&quot;id&quot;</span> <span class="p">:</span> <span class="mi">1234</span><span class="p">,</span>
+     <span class="s2">&quot;firstname&quot;</span> <span class="p">:</span> <span class="s2">&quot;john&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;lastname&quot;</span> <span class="p">:</span> <span class="s2">&quot;doe&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;email&quot;</span> <span class="p">:</span> <span class="s2">&quot;jdoe@gmail.com&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;creation_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;modification_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;survey_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;tests_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;result&quot;</span> <span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+     <span class="s2">&quot;result_timestamp&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;survey&quot;</span> <span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+     <span class="s2">&quot;tests&quot;</span> <span class="p">:</span> <span class="o">...</span>
+  <span class="p">},</span>
+  <span class="o">...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Note that the survey and result values will be JSON strings and the tests
+value will be a base64 encoded string.</p>
+</dd></dl>
+
+</section>
+<section id="module-app.api.tokens">
+<span id="tokens"></span><h3>Tokens<a class="headerlink" href="#module-app.api.tokens" title="Permalink to this headline">¶</a></h3>
+<p>Token REST API endpoints.</p>
+<p>These endpoints facilitate the creation and revoking of temporary access
+tokens needed for users to access and modify their data. Admin accounts
+also need a token to use their respective endpoints.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="app.api.tokens.get_token">
+<span class="sig-prename descclassname"><span class="pre">app.api.tokens.</span></span><span class="sig-name descname"><span class="pre">get_token</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.api.tokens.get_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a tempory access token from an existing account. By default, the
+token will expire after one hour.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">POST</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">tokens</span>
+</pre></div>
+</div>
+<p>Expected JSON response:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;token&quot;</span> <span class="p">:</span> <span class="s2">&quot;alsjen282j3nbau3o83nak837ck83h7x34&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;expiration&quot;</span> <span class="p">:</span> <span class="s2">&quot;YYYY-MM-DDTHH:MM:SS.SSSS&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that you must include an email and password for the associated
+user account in the HTTP header.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.api.tokens.revoke_token">
+<span class="sig-prename descclassname"><span class="pre">app.api.tokens.</span></span><span class="sig-name descname"><span class="pre">revoke_token</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.api.tokens.revoke_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Revoke a user token.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DELETE</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">tokens</span>
+</pre></div>
+</div>
+<p>Note that this endpoint is locked down via token authentication. The
+token associated with the user account must be provided as a bearer
+token in the HTTP header.</p>
+</dd></dl>
+
+</section>
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and Tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Fall Risk DB</a><ul>
+<li><a class="reference internal" href="#running-the-development-server">Running the development server</a></li>
+<li><a class="reference internal" href="#the-authentication-process">The authentication process</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#source-code">Source Code</a><ul>
+<li><a class="reference internal" href="#user-model">User Model</a></li>
+<li><a class="reference internal" href="#rest-api-endpoints">REST API Endpoints</a><ul>
+<li><a class="reference internal" href="#module-app.api.user">User</a></li>
+<li><a class="reference internal" href="#module-app.api.admin">Admin</a></li>
+<li><a class="reference internal" href="#module-app.api.tokens">Tokens</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and Tables</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Fall Risk DB  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Fall Risk DB</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Matt Krol.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+    </div>
+  </body>
+</html>
