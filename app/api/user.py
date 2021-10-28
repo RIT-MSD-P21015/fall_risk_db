@@ -39,7 +39,7 @@ def create_user():
 
     for field in ['firstname', 'lastname', 'email', 'password']:
         if field not in data:
-            return bad_request('The field \'{}\' must be included.'.format(key))
+            return bad_request('The field \'{}\' must be included.'.format(field))
 
     if User.query.filter_by(email=data['email']).first():
         return bad_request('The email address \'{}\' already exists. '
