@@ -1,9 +1,12 @@
 from datetime import datetime, timedelta
+from time import time
 from app import db
 import os
 import base64
 import json
+import jwt
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask import current_app
 
 
 class User(db.Model):
@@ -183,3 +186,32 @@ class User(db.Model):
 
         if new_user and 'password' in data:
             self.set_password(data['password'])
+
+
+    def get_reset_password_token(self, expires_in=600):
+        """Create a unique JSON web token (JWT) for user password reset.
+
+        :param expires_in: The time in seconds before the JWT expires.
+
+        :return: The JWT token.
+        """
+        return jwt.encode({'reset_password': self.id, 'exp': time() + expires_in},
+                          current_app.config['SECRET_KEY'],
+                          algorithm='HS256')
+
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        """Verify ownership of a JWT token.
+
+        :param token: The JWT token.
+
+        :return: The user who owns the JWT token or None if no user was found.
+        """
+        try:
+            id = jwt.decode(token,
+                            current_app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return User.query.get(id)

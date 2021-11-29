@@ -2,4 +2,7 @@ Flask
 Flask-SQLAlchemy
 Flask-HTTPAuth
 Flask-Migrate
+Flask-Mail
+PyJWT
+Flask-WTF
 psycopg2-binary

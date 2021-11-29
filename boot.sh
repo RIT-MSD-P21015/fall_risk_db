@@ -1,5 +1,5 @@
 #!/bin/bash
-sleep 5
+sleep 3
 source venv/bin/activate
 flask db upgrade
-exec gunicorn --bind "0.0.0.0:5000" "fall_risk_db:app"
+exec gunicorn --workers=4 --bind "0.0.0.0:5000" "fall_risk_db:app"
