@@ -12,7 +12,7 @@ class Config(object):
     MAIL_PORT = 587
     MAIL_USE_TLS = True
     MAIL_USERNAME = 'fallriskdevs@gmail.com'
-    MAIL_PASSWORD = 'oobahLoh1xie'
+    MAIL_PASSWORD='koylhomrsbhxnlrg'
 
 
 class DevelopmentConfig(Config):
