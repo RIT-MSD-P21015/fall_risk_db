@@ -217,6 +217,7 @@ def reset_password(token):
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.set_password(form.password.data)
+        user.modification_timestamp = datetime.utcnow()
         db.session.commit()
         return render_template('reset_password_success.html')
     return render_template('reset_password_form.html', form=form)
