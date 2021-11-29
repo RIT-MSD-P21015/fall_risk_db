@@ -171,7 +171,7 @@ class User(db.Model):
 
         if 'tests' in data:
             self.tests_timestamp = datetime.utcnow()
-            self.tests = base64.b64decode(data['tests'].encode('utf-8'))
+            self.tests = base64.b64decode(data['tests'])
 
         if 'survey' in data:
             self.survey_timestamp = datetime.utcnow()
