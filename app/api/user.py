@@ -178,6 +178,17 @@ def delete_user():
 
 @bp.route('/reset_password_request/<email>', methods=['GET'])
 def reset_password_request(email):
+    """Request a password reset.
+
+    ::
+
+        GET /api/reset_password_request/<email>
+
+    This will always return a 200 status code, unless something catastrophic
+    happens. If the email exists, a password reset email will be sent and
+    a unique JWT token will be created for that user. Otherwise, it will do
+    nothing.
+    """
     user = User.query.filter_by(email=email).first()
     if user:
         send_password_reset_email(user)
@@ -190,6 +201,16 @@ def reset_password_request(email):
 
 @bp.route('/reset_password/<token>', methods=['POST', 'GET'])
 def reset_password(token):
+    """Reset password web form. This is a web page, not a REST endpoint.
+
+    ::
+
+        GET /api/reset_password/<token>
+
+    This is where the user will reset their password. The link to this view is
+    sent to the user's email after a successful call to the ``reset_password_request``
+    endpoint. The token parameter holds the JWT token created by ``reset_password_request``.
+    """
     user = User.verify_reset_password_token(token)
     if not user:
         return render_template('reset_password_failure.html')

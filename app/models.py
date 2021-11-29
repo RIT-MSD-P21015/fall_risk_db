@@ -174,7 +174,7 @@ class User(db.Model):
 
         if 'tests' in data:
             self.tests_timestamp = datetime.utcnow()
-            self.tests = base64.b64decode(data['tests'].encode('utf-8'))
+            self.tests = base64.b64decode(data['tests'])
 
         if 'survey' in data:
             self.survey_timestamp = datetime.utcnow()
@@ -189,6 +189,12 @@ class User(db.Model):
 
 
     def get_reset_password_token(self, expires_in=600):
+        """Create a unique JSON web token (JWT) for user password reset.
+
+        :param expires_in: The time in seconds before the JWT expires.
+
+        :return: The JWT token.
+        """
         return jwt.encode({'reset_password': self.id, 'exp': time() + expires_in},
                           current_app.config['SECRET_KEY'],
                           algorithm='HS256')
@@ -196,6 +202,12 @@ class User(db.Model):
 
     @staticmethod
     def verify_reset_password_token(token):
+        """Verify ownership of a JWT token.
+
+        :param token: The JWT token.
+
+        :return: The user who owns the JWT token or None if no user was found.
+        """
         try:
             id = jwt.decode(token,
                             current_app.config['SECRET_KEY'],
