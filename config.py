@@ -9,8 +9,8 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///../db.sqlite3'
     SECRET_KEY = 'eiyee9iew9IuphoopeaBahP0a'
     MAIL_SERVER = 'smtp.gmail.com'
-    MAIL_PORT = 465
-    MAIL_USE_SSL = True
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
     MAIL_USERNAME = 'fallriskdevs@gmail.com'
     MAIL_PASSWORD = 'oobahLoh1xie'
 
