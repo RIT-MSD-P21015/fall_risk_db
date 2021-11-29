@@ -6,6 +6,7 @@ import json
 import pickle
 import random
 import argparse
+import base64
 from TestUser import TestUser
 from TestAdmin import TestAdmin
 
