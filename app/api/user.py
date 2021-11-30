@@ -173,6 +173,7 @@ def delete_user():
     associated with the user attached to the provided token.
     """
     db.session.delete(token_auth.current_user())
+    db.session.commit()
     return ('', 204)
 
 
