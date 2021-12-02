@@ -41,8 +41,9 @@
 <h1>Fall Risk DB<a class="headerlink" href="#fall-risk-db" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<section id="running-the-development-server">
-<h2>Running the development server<a class="headerlink" href="#running-the-development-server" title="Permalink to this headline">¶</a></h2>
+<p>Welcome to the Fall Risk DB documentation pages. Fall Risk DB is a Python Flask web application that can be deployed on a server to interact with the Fall Risk Mobile Android application. At the heart of Fall Risk DB is as HTTP REST API that can be used by a wide range of clients.</p>
+<section id="deploying-the-development-server">
+<h2>Deploying the development server<a class="headerlink" href="#deploying-the-development-server" title="Permalink to this headline">¶</a></h2>
 <p>Using the development server is an easy process. First, you will need to clone the repository and change your directory to the root of the project.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone git@github.com:RIT-MSD-P21015/fall_risk_db.git
 $ cd fall_risk_db
@@ -62,6 +63,44 @@ $ flask create-admin &lt;firstname&gt; &lt;lastname&gt; &lt;email&gt; &lt;passwo
 </pre></div>
 </div>
 <p>Now the web server is ready to be used. Alternatively, you can open up a special Python shell to interact in real time with the application using <code class="docutils literal notranslate"><span class="pre">flask</span> <span class="pre">shell</span></code>. Note that when you shut down the server, the <code class="docutils literal notranslate"><span class="pre">db.sqlite3</span></code> database file will still persist, and will be used on the next start up.</p>
+</section>
+<section id="deploying-the-production-server">
+<h2>Deploying the production server<a class="headerlink" href="#deploying-the-production-server" title="Permalink to this headline">¶</a></h2>
+<p>In order to deploy the production server, you will need a server computer or virtual machine with an operating system—we can only recommend Linux—capable of running <a class="reference external" href="https://www.docker.com/">Docker</a>. Install <cite>docker</cite> and <cite>docker-compose</cite> on your computer and enable/start the docker engine. First, you will need to clone the server repository. In your shell, clone the server git repository and navigate to the root directory of the repository.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone git@github.com:RIT-MSD-P21015/fall_risk_db.git
+$ cd fall_risk_db
+</pre></div>
+</div>
+<p>Next, we need to setup the file permissions for docker. Set full permissions to the <cite>app</cite> and <cite>migrations</cite> directory by using the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ chmod 755 -R app/ migrations/
+</pre></div>
+</div>
+<p>Next, we will build the docker images. Type in the following command to build the docker images:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ docker-compose build
+</pre></div>
+</div>
+<p>There are two main docker containers that work with each other:</p>
+<ul class="simple">
+<li><p><cite>web</cite>: This is the container that runs the <a class="reference external" href="https://palletsprojects.com/p/flask/">Flask</a> web application and the <a class="reference external" href="https://wsgi.readthedocs.io/en/latest/">WSGI</a> HTTP server <a class="reference external" href="https://gunicorn.org/">gunicorn</a>, i.e., the REST API.</p></li>
+<li><p><cite>db</cite> : This is the container that runs <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a>, i.e., the database.</p></li>
+</ul>
+<p>The database data is persistent and is stored in the <code class="docutils literal notranslate"><span class="pre">postgresql-data</span></code> directory. This way, the <cite>web</cite> container can easily be rebuilt without losing the data in the database using the command <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">docker-compose</span> <span class="pre">build</span> <span class="pre">web</span></code>. We also have setup database migration via <a class="reference external" href="https://flask-migrate.readthedocs.io/en/latest/index.html">Flask-Migrate</a> and <a class="reference external" href="https://alembic.sqlalchemy.org/en/latest/">Alembic</a>—see their respective document pages for more information.</p>
+<p>Now we are ready to run the server. To do this simply type <cite>docker-compose up</cite>. If all goes well, you should see that the <cite>web</cite> and <cite>db</cite> containers have started. If this is a fresh database instance, you will need to seed the database with an admin account. First, we will execute a bash session inside of the <cite>web</cite> container and setup our environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ docker-compose exec web bash
+$ export FLASK_APP=fall_risk_db.py
+$ export APP_CONFIG=config.ProductionConfig
+$ source venv/bin/activate
+</pre></div>
+</div>
+<p>To seed the database with an admin account you can use the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ flask create-admin firstname lastname email@email.com password
+</pre></div>
+</div>
+<p>To perform arbitrary tasks with the live web application, you can open up a special Python shell session:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ flask shell
+</pre></div>
+</div>
+<p>That’s it! The web application should be up and running. To shut down the web server you can type <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">docker-compose</span> <span class="pre">down</span></code>, this will shut down the web application and database.</p>
 </section>
 <section id="the-authentication-process">
 <h2>The authentication process<a class="headerlink" href="#the-authentication-process" title="Permalink to this headline">¶</a></h2>
@@ -277,7 +316,7 @@ associated with the user attached to the provided token.</p>
 <dt class="sig sig-object py" id="app.api.user.get_user">
 <span class="sig-prename descclassname"><span class="pre">app.api.user.</span></span><span class="sig-name descname"><span class="pre">get_user</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.api.user.get_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get user data. Returns a 200 status code if successful.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>GET /api/user/?survey=0&amp;tests=0
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>GET /api/user?survey=0&amp;tests=0
 </pre></div>
 </div>
 <p>This endpoint is locked down via token authentication and will require a
@@ -413,7 +452,7 @@ in the returned JSON.</p>
 <span class="sig-prename descclassname"><span class="pre">app.api.admin.</span></span><span class="sig-name descname"><span class="pre">admin_get_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.api.admin.admin_get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get tests and survey data from all users who need to be evaluated for
 fall risk.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>GET /api/admin/data/?limit=25
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>GET /api/admin/data?limit=25
 </pre></div>
 </div>
 <p>Note that this entry is locked down via token authentication and has the
@@ -520,7 +559,8 @@ token in the HTTP header.</p>
   <h3><a href="#">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Fall Risk DB</a><ul>
-<li><a class="reference internal" href="#running-the-development-server">Running the development server</a></li>
+<li><a class="reference internal" href="#deploying-the-development-server">Deploying the development server</a></li>
+<li><a class="reference internal" href="#deploying-the-production-server">Deploying the production server</a></li>
 <li><a class="reference internal" href="#the-authentication-process">The authentication process</a></li>
 </ul>
 </li>

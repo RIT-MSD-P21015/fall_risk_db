@@ -67,7 +67,7 @@ def get_user():
 
     ::
         
-        GET /api/user/?survey=0&tests=0
+        GET /api/user?survey=0&tests=0
 
     This endpoint is locked down via token authentication and will require a
     bearer token to be included in the HTTP header. Since each token is unique

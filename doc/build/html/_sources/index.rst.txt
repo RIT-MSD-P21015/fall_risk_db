@@ -5,8 +5,10 @@ Fall Risk DB
    :maxdepth: 2
    :caption: Contents:
 
-Running the development server
-++++++++++++++++++++++++++++++
+Welcome to the Fall Risk DB documentation pages. Fall Risk DB is a Python Flask web application that can be deployed on a server to interact with the Fall Risk Mobile Android application. At the heart of Fall Risk DB is as HTTP REST API that can be used by a wide range of clients.
+
+Deploying the development server
+++++++++++++++++++++++++++++++++
 
 Using the development server is an easy process. First, you will need to clone the repository and change your directory to the root of the project.
 
@@ -34,6 +36,58 @@ Next, with the development server still up an running, we will seed the database
     $ flask create-admin <firstname> <lastname> <email> <password>
 
 Now the web server is ready to be used. Alternatively, you can open up a special Python shell to interact in real time with the application using ``flask shell``. Note that when you shut down the server, the ``db.sqlite3`` database file will still persist, and will be used on the next start up.
+
+Deploying the production server
++++++++++++++++++++++++++++++++
+
+In order to deploy the production server, you will need a server computer or virtual machine with an operating system---we can only recommend Linux---capable of running `Docker <https://www.docker.com/>`_. Install `docker` and `docker-compose` on your computer and enable/start the docker engine. First, you will need to clone the server repository. In your shell, clone the server git repository and navigate to the root directory of the repository.
+
+::
+    
+    $ git clone git@github.com:RIT-MSD-P21015/fall_risk_db.git
+    $ cd fall_risk_db
+
+Next, we need to setup the file permissions for docker. Set full permissions to the `app` and `migrations` directory by using the following command:
+
+::
+    
+    $ chmod 755 -R app/ migrations/
+
+Next, we will build the docker images. Type in the following command to build the docker images:
+
+::
+    
+    $ docker-compose build
+
+There are two main docker containers that work with each other:
+
+* `web`: This is the container that runs the `Flask <https://palletsprojects.com/p/flask/>`_ web application and the `WSGI <https://wsgi.readthedocs.io/en/latest/>`_ HTTP server `gunicorn <https://gunicorn.org/>`_, i.e., the REST API.
+* `db` : This is the container that runs `PostgreSQL <https://www.postgresql.org/>`_, i.e., the database.
+
+The database data is persistent and is stored in the ``postgresql-data`` directory. This way, the `web` container can easily be rebuilt without losing the data in the database using the command ``$ docker-compose build web``. We also have setup database migration via `Flask-Migrate <https://flask-migrate.readthedocs.io/en/latest/index.html>`_ and `Alembic <https://alembic.sqlalchemy.org/en/latest/>`_---see their respective document pages for more information. 
+
+Now we are ready to run the server. To do this simply type `docker-compose up`. If all goes well, you should see that the `web` and `db` containers have started. If this is a fresh database instance, you will need to seed the database with an admin account. First, we will execute a bash session inside of the `web` container and setup our environment:
+
+::
+    
+    $ docker-compose exec web bash
+    $ export FLASK_APP=fall_risk_db.py
+    $ export APP_CONFIG=config.ProductionConfig
+    $ source venv/bin/activate
+
+To seed the database with an admin account you can use the following command:
+
+::
+
+    $ flask create-admin firstname lastname email@email.com password
+
+To perform arbitrary tasks with the live web application, you can open up a special Python shell session:
+
+::
+
+    $ flask shell
+
+That's it! The web application should be up and running. To shut down the web server you can type ``$ docker-compose down``, this will shut down the web application and database.
 
 The authentication process
 ++++++++++++++++++++++++++

@@ -100,7 +100,7 @@ def admin_get_data():
 
     ::
         
-        GET /api/admin/data/?limit=25
+        GET /api/admin/data?limit=25
 
     Note that this entry is locked down via token authentication and has the
     additional requirement that the user associated with the token has the

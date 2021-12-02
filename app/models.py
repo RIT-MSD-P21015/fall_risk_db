@@ -168,17 +168,13 @@ class User(db.Model):
 
         :param new_user: Allow for the password key to be used to change a user password.
         """
-        for field in ['firstname', 'lastname', 'email']:
+        for field in ['firstname', 'lastname', 'email', 'survey']:
             if field in data:
                 setattr(self, field, data[field])
 
         if 'tests' in data:
             self.tests_timestamp = datetime.utcnow()
             self.tests = base64.b64decode(data['tests'])
-
-        if 'survey' in data:
-            self.survey_timestamp = datetime.utcnow()
-            self.survey = json.dumps(data['survey'])
 
         if 'result' in data:
             self.result_timestamp = datetime.utcnow()
