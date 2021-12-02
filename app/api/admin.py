@@ -4,7 +4,6 @@ These REST API endpoints are only available to users who have the admin flag
 set on their account. This can only be done manually by a system administrator.
 """
 from flask import jsonify, request, url_for, abort
-import json
 from datetime import datetime
 from app import db
 from app.models import User
@@ -74,7 +73,7 @@ def admin_create_results():
             continue
 
         user.result_timestamp = datetime.utcnow()
-        user.result = json.dumps(data[i]['result'])
+        user.result = data[i]['result']
         db.session.merge(user)
 
     db.session.commit()

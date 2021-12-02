@@ -3,7 +3,6 @@ from time import time
 from app import db
 import os
 import base64
-import json
 import jwt
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import current_app
