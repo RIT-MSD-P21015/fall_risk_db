@@ -26,7 +26,7 @@ class User(db.Model):
 
     :cvar modification_timestamp: A datetime object containing the date that the user account was last modified. Defaults to the creation_timestamp value.
 
-    :cvar survey: A JSON string containing a the survey data of a user.
+    :cvar survey: A base64 encoded JSON string containing the survey data of a user.
 
     :cvar survey_timestamp: A datetime object containing the date of the last survey that the user took. This value can be None.
 
@@ -168,9 +168,13 @@ class User(db.Model):
 
         :param new_user: Allow for the password key to be used to change a user password.
         """
-        for field in ['firstname', 'lastname', 'email', 'survey']:
+        for field in ['firstname', 'lastname', 'email']:
             if field in data:
                 setattr(self, field, data[field])
+
+        if 'survey' in data:
+            self.survey_timestamp = datetime.utcnow()
+            self.survey = data['survey']
 
         if 'tests' in data:
             self.tests_timestamp = datetime.utcnow()
