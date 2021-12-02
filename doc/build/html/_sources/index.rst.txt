@@ -5,7 +5,7 @@ Fall Risk DB
    :maxdepth: 2
    :caption: Contents:
 
-Welcome to the Fall Risk DB documentation pages. Fall Risk DB is a Python Flask web application that can be deployed on a server to interact with the Fall Risk Mobile Android application. At the heart of Fall Risk DB is as HTTP REST API that can be used by a wide range of clients.
+Welcome to the Fall Risk DB documentation pages. Fall Risk DB is a Python Flask web application that can be deployed on a server to interact with the Fall Risk Mobile Android application. At the heart of Fall Risk DB is as HTTP REST API. This web application
 
 Deploying the development server
 ++++++++++++++++++++++++++++++++

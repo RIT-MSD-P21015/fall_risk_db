@@ -34,7 +34,7 @@ class User(db.Model):
 
     :cvar tests_timestamp: A datetime object containing the date of the last tests that the user took. This value can be None.
 
-    :cvar result: A JSON string containing the fall risk result. This value can be None.
+    :cvar result: A string containing the fall risk result. This value can be None.
 
     :cvar result_timestamp: A datetime object containing the date of the last result that was posted.
 
@@ -182,7 +182,7 @@ class User(db.Model):
 
         if 'result' in data:
             self.result_timestamp = datetime.utcnow()
-            self.result = json.dumps(data['result'])
+            self.result = data['result']
 
         if new_user and 'password' in data:
             self.set_password(data['password'])

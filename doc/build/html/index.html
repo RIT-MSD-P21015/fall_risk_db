@@ -41,7 +41,7 @@
 <h1>Fall Risk DB<a class="headerlink" href="#fall-risk-db" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>Welcome to the Fall Risk DB documentation pages. Fall Risk DB is a Python Flask web application that can be deployed on a server to interact with the Fall Risk Mobile Android application. At the heart of Fall Risk DB is as HTTP REST API that can be used by a wide range of clients.</p>
+<p>Welcome to the Fall Risk DB documentation pages. Fall Risk DB is a Python Flask web application that can be deployed on a server to interact with the Fall Risk Mobile Android application. At the heart of Fall Risk DB is as HTTP REST API. This web application</p>
 <section id="deploying-the-development-server">
 <h2>Deploying the development server<a class="headerlink" href="#deploying-the-development-server" title="Permalink to this headline">¶</a></h2>
 <p>Using the development server is an easy process. First, you will need to clone the repository and change your directory to the root of the project.</p>
@@ -134,11 +134,11 @@ $ source venv/bin/activate
 <li><p><strong>admin</strong> – A boolean flag indicating if a user has admin privileges or not.</p></li>
 <li><p><strong>creation_timestamp</strong> – A datetime object containing the creation date of the user account.</p></li>
 <li><p><strong>modification_timestamp</strong> – A datetime object containing the date that the user account was last modified. Defaults to the creation_timestamp value.</p></li>
-<li><p><strong>survey</strong> – A JSON string containing a the survey data of a user.</p></li>
+<li><p><strong>survey</strong> – A base64 encoded JSON string containing the survey data of a user.</p></li>
 <li><p><strong>survey_timestamp</strong> – A datetime object containing the date of the last survey that the user took. This value can be None.</p></li>
 <li><p><strong>tests</strong> – A binary blob containing the serialized Java class that should contain the tests data of a user. This value can be None.</p></li>
 <li><p><strong>tests_timestamp</strong> – A datetime object containing the date of the last tests that the user took. This value can be None.</p></li>
-<li><p><strong>result</strong> – A JSON string containing the fall risk result. This value can be None.</p></li>
+<li><p><strong>result</strong> – A string containing the fall risk result. This value can be None.</p></li>
 <li><p><strong>result_timestamp</strong> – A datetime object containing the date of the last result that was posted.</p></li>
 <li><p><strong>password_hash</strong> – A string containing the user hashed password.</p></li>
 <li><p><strong>token</strong> – A string that contains a user temporary access token.</p></li>
