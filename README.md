@@ -37,8 +37,8 @@ Any RIT student can login with their RIT username/password. However, students mu
   * `usermod -aG fallguys <username>` 
   * `usermod -aG fall_risk_devs <username>`
 * By default, developers do not have admin/root access. To grant a user admin access, add them to the 'wheel' group.
-  * `usermod -aG wheel <username>`
   * Note: be careful with granting users this access. It should be restricted to only those who absolutely need it. 
+  * `usermod -aG wheel <username>`
 
 ## Extras
 * More information about docker can be found here: [docker documentation](https://docs.docker.com/)
