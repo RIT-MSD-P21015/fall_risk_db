@@ -17,3 +17,4 @@ Server Contact: Matt Krol `mrk7339@rit.edu`
 * See the docs for starting and stopping the server. 
   * The files are currently located under `/srv/www/fall_risk_db`
   * You can access them by using `cd`: `cd /srv/www/fall_risk_db`
+  * The server is currently being run under docker
