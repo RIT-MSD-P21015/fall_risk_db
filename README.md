@@ -8,6 +8,7 @@ Server Contact: Matt Krol `mrk7339@rit.edu`
 
 ## Accessing the current server
 * The current server resides at the following address: `fallriskdb-vm.main.ad.rit.edu`
+* The files are currently located under `/srv/www/fall_risk_db`
 * By design, the server can be accessed from any internet connected device.
 * For the following instructions, the term `run` is used to refer to typing in a command and hitting enter into the command prompt. For example, to 'run' ssh, type `ssh` into the command prompt and hit enter. The commands are also blocked out `like this`. When told to run a command, type everything `in the block`. 
 * To log in to the server over SSH, use PuTTY or the command line in the following way:
@@ -16,8 +17,7 @@ Server Contact: Matt Krol `mrk7339@rit.edu`
   * PuTTY enter `fallriskdb-vm.main.ad.rit.edu` in the 'hostname' space and click 'open'. 
   * type the password when prompted. Note, the cursor will not move, but the password is still being sent as you type it. If you make a mistake, it's good to hold backspace for a few seconds to make sure you clear the whole password and start over. 
 * Starting the server. 
-  * The files are currently located under `/srv/www/fall_risk_db`
-  * You can access them by using `cd`: `cd /srv/www/fall_risk_db`
+  * Move to the server's files using `cd`: `cd /srv/www/fall_risk_db`
   * The server is currently being run under docker in tmux. Run `tmux` to start a tmux session which allows you to log off and keep the server running
   * run `docker-compose up` to start the server
   * Log off by typing `Ctrl-b` at the same time, then `d` to 'detach' from tmux and return to a normal command prompt. You can log off with `exit`. 
