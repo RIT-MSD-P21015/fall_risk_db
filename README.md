@@ -19,7 +19,5 @@ Server Contact: Matt Krol `mrk7339@rit.edu`
   * You can access them by using `cd`: `cd /srv/www/fall_risk_db`
   * The server is currently being run under docker
   * run `docker-compose up` to start the server
-  * Note: to run the server, you must be a member of the `docker` group. If you see the issue `ERROR: Couldn't connect to Docker daemon`, you can run the following command to add yourself to the docker group.
-  * `sudo usermod -aG docker <username>`
-  * log out and log back in for the changes to take effect
+  * Note: to run the server, you must be a member of the `docker` group. If you see the issue `ERROR: Couldn't connect to Docker daemon`, you can run the following command to add yourself to the docker group: `sudo usermod -aG docker <username>` log out and log back in for the changes to take effect
   * The docker daemon must also be running. Use `systemctl status docker` to check if docker is `active`. If it is not, use `systemctl start docker` to start the docker daemon. 
