@@ -5,3 +5,6 @@
 - Use the following link in any web browser
 
 file:///C:/Users/Public/Documents/fall_risk_db-main/doc/build/html/index.html
+
+## todo
+- how to login to current server and current server url
