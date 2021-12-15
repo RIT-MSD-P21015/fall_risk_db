@@ -5,3 +5,7 @@
 * Use the following link in any web browser `file:///C:/Users/Public/Documents/fall_risk_db-main/doc/build/html/index.html`
 
 Server Contact: Matt Krol `mrk7339@rit.edu`
+
+## Accessing the current server
+
+`fallriskdb-vm.main.ad.rit.edu`
