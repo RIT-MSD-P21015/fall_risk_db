@@ -14,7 +14,12 @@ Server Contact: Matt Krol `mrk7339@rit.edu`
   * SSH `ssh <RIT username>@fallriskdb-vm.main.ad.rit.edu`
   * PuTTY enter `fallriskdb-vm.main.ad.rit.edu` in the 'hostname' space and click 'open'. 
   * type the password when prompted. Note, the cursor will not move, but the password is still being sent as you type it. If you make a mistake, it's good to hold backspace for a few seconds to make sure you clear the whole password and start over. 
-* See the docs for starting and stopping the server. 
+* Starting the server. 
   * The files are currently located under `/srv/www/fall_risk_db`
   * You can access them by using `cd`: `cd /srv/www/fall_risk_db`
   * The server is currently being run under docker
+  * run `docker-compose up` to start the server
+  * Note: to run the server, you must be a member of the `docker` group. If you see the issue `ERROR: Couldn't connect to Docker daemon`, you can run the following command to add yourself to the docker group.
+  * `sudo usermod -aG docker <username>`
+  * log out and log back in for the changes to take effect
+  * The docker daemon must also be running. Use `systemctl status docker` to check if docker is `active`. If it is not, use `systemctl start docker` to start the docker daemon. 
