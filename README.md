@@ -26,6 +26,17 @@ Server Contact: Matt Krol `mrk7339@rit.edu`
   * Note: to run the server, you must be a member of the `docker` group. If you see the issue `ERROR: Couldn't connect to Docker daemon`, you can run the following command to add yourself to the docker group: `sudo usermod -aG docker <username>` log out and log back in for the changes to take effect
   * Note: The docker daemon must also be running. Use `systemctl status docker` to check if docker is `active`. If it is not, use `systemctl start docker` to start the docker daemon.
 
+## Adding Server Users
+Any RIT student can login with their RIT username/password. However, students must be explicitely set up on the server in order to be able to run the docker, change code, or even create directories. To do so, run the following commands:
+* Gain root: `sudo su`
+  * This allows you to do the rest of the commands
+* Make a user home directory: `mkhomedir_helper <username>` 
+  * This allows the user to login to a private folder where they can create files, change their user settings, etc.
+* Add user to the relevant groups:
+  * `usermod -aG docker <username>`
+  * `usermod -aG fallguys <username>` 
+  * `usermod -aG fall_risk_devs <username>`
+
 ## Extras
 * More information about docker can be found here: [docker documentation](https://docs.docker.com/)
 * More information about tmux can be found here: [tmux documentation](https://linuxize.com/post/getting-started-with-tmux/)
